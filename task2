@@ -1,0 +1,63 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_california_housing
+
+# Load the California Housing dataset
+california = fetch_california_housing()
+df = pd.DataFrame(california.data, columns=california.feature_names)
+df['MedHouseVal'] = california.target
+
+# Display the first few rows of the dataset
+print(df)
+
+df.head()
+
+from sklearn.model_selection import train_test_split
+
+# Define the feature matrix (X) and the target vector (y)
+X = df.drop('MedHouseVal', axis=1)
+y = df['MedHouseVal']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+from sklearn.linear_model import LinearRegression
+
+# Create the model
+model = LinearRegression()
+
+# Train the model
+model.fit(X_train, y_train)
+
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Make predictions on the testing set
+y_pred = model.predict(X_test)
+
+# Calculate the mean squared error and R-squared
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+
+# Plot the actual vs. predicted values
+plt.figure(figsize=(10, 6))
+plt.scatter(y_test, y_pred, color='blue', label='Actual vs Predicted')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2, label='Perfect Fit Line')
+plt.xlabel('Actual')
+plt.ylabel('Predicted')
+plt.title('Actual vs Predicted Values')
+plt.legend()
+plt.show()
+
+# Visualize residuals
+residuals = y_test - y_pred
+plt.figure(figsize=(10, 6))
+plt.scatter(y_pred, residuals)
+plt.hlines(y=0, xmin=y_pred.min(), xmax=y_pred.max(), colors='r', linestyles='dashed')
+plt.xlabel('Predicted')
+plt.ylabel('Residuals')
+plt.title('Residuals vs Predicted')
+plt.show()
